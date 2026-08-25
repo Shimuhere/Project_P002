@@ -14,6 +14,7 @@ class GameControlsWidget extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text('Reset Scoreboard?'),
         content: const Text('This will reset current X Wins, O Wins, and Ties to 0.'),
         actions: [
@@ -25,11 +26,28 @@ class GameControlsWidget extends StatelessWidget {
             onPressed: () {
               context.read<GameProvider>().resetScoreboard();
               Navigator.of(ctx).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Scoreboard reset to 0!'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
             },
             style: FilledButton.styleFrom(backgroundColor: const Color(0xFFEF4444)),
             child: const Text('Reset'),
           ),
         ],
+      ),
+    );
+  }
+
+  void _onResetBoard(BuildContext context, GameProvider game) {
+    game.resetBoard();
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Board reset! Ready for a new round.'),
+        duration: Duration(seconds: 2),
       ),
     );
   }
@@ -107,7 +125,7 @@ class GameControlsWidget extends StatelessWidget {
                   ],
                 ),
                 ElevatedButton.icon(
-                  onPressed: () => game.resetBoard(),
+                  onPressed: () => _onResetBoard(context, game),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: const Color(0xFF1E293B),
@@ -139,7 +157,7 @@ class GameControlsWidget extends StatelessWidget {
                 icon: Icons.refresh_rounded,
                 label: 'Reset Board',
                 color: const Color(0xFF6366F1),
-                onTap: () => game.resetBoard(),
+                onTap: () => _onResetBoard(context, game),
               ),
             ),
             const SizedBox(width: 10),

@@ -129,6 +129,7 @@ class GameProvider with ChangeNotifier {
     await historyProvider.saveMatch(match);
   }
 
+  /// Resets the current game board, game over state, and turn back to initial starter.
   void resetBoard() {
     _board = List.filled(9, symbolEmpty);
     _isGameOver = false;
@@ -137,6 +138,20 @@ class GameProvider with ChangeNotifier {
     _currentSymbol = _startingSymbol;
     _isMatchSaved = false;
     notifyListeners();
+  }
+
+  /// Resets the active game board, with an option to also reset session scores.
+  void resetGame({bool resetScoreboard = false}) {
+    resetBoard();
+    if (resetScoreboard) {
+      this.resetScoreboard();
+    }
+  }
+
+  /// Performs a full game reset: clears the board and resets all scoreboard session counters.
+  void resetAll() {
+    resetBoard();
+    resetScoreboard();
   }
 
   void switchStartingPlayer() {
@@ -151,3 +166,4 @@ class GameProvider with ChangeNotifier {
     notifyListeners();
   }
 }
+

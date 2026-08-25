@@ -6,8 +6,16 @@ import 'package:cse464_p002_tictactoe/models/match_model.dart';
 import 'package:cse464_p002_tictactoe/utility/constant.dart';
 
 class MatchHistoryProvider with ChangeNotifier {
-  final CollectionReference _matchesCollection =
-      FirebaseFirestore.instance.collection(matchesCollection);
+  final FirebaseFirestore? _customFirestore;
+
+  CollectionReference? get _matchesCollection {
+    try {
+      final fs = _customFirestore ?? FirebaseFirestore.instance;
+      return fs.collection(matchesCollection);
+    } catch (_) {
+      return null;
+    }
+  }
 
   StreamSubscription<QuerySnapshot>? _subscription;
 
@@ -19,8 +27,13 @@ class MatchHistoryProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  MatchHistoryProvider() {
-    _initStream();
+  MatchHistoryProvider({FirebaseFirestore? firestore, bool autoInit = true})
+      : _customFirestore = firestore {
+    if (autoInit) {
+      _initStream();
+    } else {
+      _isLoading = false;
+    }
   }
 
   void _initStream() {
@@ -28,7 +41,13 @@ class MatchHistoryProvider with ChangeNotifier {
     _isLoading = true;
     _error = null;
 
-    _subscription = _matchesCollection
+    final col = _matchesCollection;
+    if (col == null) {
+      _isLoading = false;
+      return;
+    }
+
+    _subscription = col
         .orderBy('createdAt', descending: true)
         .snapshots()
         .listen(
@@ -54,8 +73,10 @@ class MatchHistoryProvider with ChangeNotifier {
   }
 
   Future<void> saveMatch(MatchModel match) async {
+    final col = _matchesCollection;
+    if (col == null) return;
     try {
-      await _matchesCollection.add(match.toJson());
+      await col.add(match.toJson());
     } catch (e) {
       _error = 'Failed to save match result: ${e.toString()}';
       notifyListeners();
@@ -63,8 +84,10 @@ class MatchHistoryProvider with ChangeNotifier {
   }
 
   Future<void> deleteMatch(String matchId) async {
+    final col = _matchesCollection;
+    if (col == null) return;
     try {
-      await _matchesCollection.doc(matchId).delete();
+      await col.doc(matchId).delete();
     } catch (e) {
       _error = 'Failed to delete match: ${e.toString()}';
       notifyListeners();
@@ -72,8 +95,10 @@ class MatchHistoryProvider with ChangeNotifier {
   }
 
   Future<void> clearAllMatches() async {
+    final col = _matchesCollection;
+    if (col == null) return;
     try {
-      final snapshot = await _matchesCollection.get();
+      final snapshot = await col.get();
       for (final doc in snapshot.docs) {
         await doc.reference.delete();
       }
