@@ -155,8 +155,7 @@ Project P002/
 │       └── scoreboard_widget.dart     # Live session scoreboard card
 ├── firestore.rules                    # Security rules deployed to Firestore
 ├── firestore.indexes.json             # Single-field index configuration
-├── pubspec.yaml                       # Dependencies & package metadata
-└── VIVA_PREPARATION_GUIDE.md          # Comprehensive Viva Defense Guide & 25 Q&A
+└── pubspec.yaml                       # Dependencies & package metadata
 ```
 
 ---
