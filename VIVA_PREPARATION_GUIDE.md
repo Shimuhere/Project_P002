@@ -97,11 +97,12 @@ flowchart TD
     GS --> GCW
     MHS --> MBW
 
-    GBW -->|Taps cell -> makeMove()| GP
-    GCW -->|resetBoard() / switchStartingPlayer()| GP
-    GP -->|Auto-persists on Game Over| MHP
-    MHP <-->|Stream snapshots & writes| FS
-    MHS -->|Observes history list| MHP
+    GBW -->|"Taps cell: makeMove()"| GP
+    GCW -->|"resetBoard() / switchStartingPlayer()"| GP
+    GP -->|"Auto-persists on Game Over"| MHP
+    MHP -->|"Write matches"| FS
+    FS -->|"Stream real-time snapshots"| MHP
+    MHS -->|"Observes history list"| MHP
 ```
 
 ---
